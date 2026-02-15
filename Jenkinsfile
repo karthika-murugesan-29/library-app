@@ -39,7 +39,14 @@ pipeline {
       steps {
         script {
           try {
-
+            publishHTML([
+              reportDir: 'target/site/jacoco',
+              reportFiles: 'index.html',
+              reportName: 'JaCoCo Coverage',
+              allowMissing: true,
+              alwaysLinkToLastBuild: true,
+              keepAll: true
+            ])
           } catch (err) {
             echo "publishHTML step failed or plugin missing: ${err}"
           }
