@@ -1,5 +1,9 @@
 pipeline {
- agent any
+ agent {
+    docker { image 'maven:3.8.8-jdk-17' args '-v /root/.m2:/root/.m2' }
+  }
+
+
     environment {
         SONAR_TOKEN = credentials('SONAR_TOKEN') // Jenkins credential ID
     }
@@ -30,11 +34,13 @@ pipeline {
       steps {
         script {
           if (env.SONAR_TOKEN) {
-           mvn sonar:sonar \
-  -Dsonar.projectKey=library-app \
-  -Dsonar.host.url=http://<SONAR_HOST>:9000 \
-  -Dsonar.login=$SONAR_TOKEN
-
+             withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
+      sh """
+        mvn ${MVN_OPTS} clean verify sonar:sonar \
+          -Dsonar.login=${SONAR_TOKEN} \
+          -Dsonar.host.url=${env.SONAR_HOST_URL ?: 'http://<SONAR_HOST_IP>:9000'}
+      """
+    }
           } else {
             echo 'SONAR_TOKEN not found; skipping Sonar analysis. Add a Jenkins credential with id SONAR_TOKEN or set SONAR_TOKEN env var.'
           }
