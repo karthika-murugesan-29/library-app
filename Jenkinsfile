@@ -14,14 +14,14 @@ pipeline {
 
     stage('Build & Test') {
       steps {
-        sh "${MVN_OPTS} mvn clean test"
+        sh "mvn ${MVN_OPTS} clean test"
       }
     }
 
     stage('Generate JaCoCo Report') {
       steps {
         // generate HTML coverage report (jaCoCo plugin configured in pom.xml)
-        sh "${MVN_OPTS} mvn jacoco:report || true"
+        sh "mvn ${MVN_OPTS} jacoco:report || true"
       }
     }
 
@@ -36,7 +36,7 @@ pipeline {
     stage('Sonar Analysis') {
       steps {
         withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-          sh "${MVN_OPTS} mvn sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=$SONAR_HOST_URL"
+          sh "mvn ${MVN_OPTS} sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=$SONAR_HOST_URL"
         }
       }
     }
