@@ -20,15 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class BookControllerTest {
 
     private MockMvc mvc;
-    private BookService service;
     private ObjectMapper mapper = new ObjectMapper();
-
-    @BeforeEach
-    void setup() {
-        service = Mockito.mock(BookService.class);
-        BookController controller = new BookController(service);
-        mvc = MockMvcBuilders.standaloneSetup(controller).build();
-    }
 
     @Test
     void addBookEndpoint() throws Exception {
@@ -37,7 +29,24 @@ class BookControllerTest {
         dto.setAuthor("A");
 
         Book saved = new Book(1L, "T", "A", true);
-        Mockito.when(service.addBook(Mockito.any())).thenReturn(saved);
+        BookService service = new BookService(null) {
+            @Override
+            public Book addBook(BookDto d) {
+                return saved;
+            }
+
+            @Override
+            public Book borrowBook(Long id) {
+                return null;
+            }
+
+            @Override
+            public java.util.List<Book> getAll() {
+                return null;
+            }
+        };
+
+        mvc = MockMvcBuilders.standaloneSetup(new BookController(service)).build();
 
         mvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -49,7 +58,18 @@ class BookControllerTest {
     @Test
     void borrowEndpointSuccess() throws Exception {
         Book b = new Book(2L, "X", "Y", false);
-        Mockito.when(service.borrowBook(2L)).thenReturn(b);
+        BookService service = new BookService(null) {
+            @Override
+            public Book addBook(BookDto d) { return null; }
+
+            @Override
+            public Book borrowBook(Long id) { return b; }
+
+            @Override
+            public java.util.List<Book> getAll() { return null; }
+        };
+
+        mvc = MockMvcBuilders.standaloneSetup(new BookController(service)).build();
 
         mvc.perform(put("/books/borrow/2"))
                 .andExpect(status().isOk())
@@ -58,7 +78,19 @@ class BookControllerTest {
 
     @Test
     void listEndpoint() throws Exception {
-        Mockito.when(service.getAll()).thenReturn(Arrays.asList(new Book(1L, "A", "B", true)));
+        java.util.List<Book> list = Arrays.asList(new Book(1L, "A", "B", true));
+        BookService service = new BookService(null) {
+            @Override
+            public Book addBook(BookDto d) { return null; }
+
+            @Override
+            public Book borrowBook(Long id) { return null; }
+
+            @Override
+            public java.util.List<Book> getAll() { return list; }
+        };
+
+        mvc = MockMvcBuilders.standaloneSetup(new BookController(service)).build();
 
         mvc.perform(get("/books"))
                 .andExpect(status().isOk())
