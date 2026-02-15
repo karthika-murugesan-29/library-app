@@ -1,10 +1,5 @@
 pipeline {
-  agent {
-    docker {
-      image 'maven:3.8.8-jdk-17'
-      args '-v /root/.m2:/root/.m2'
-    }
-  }
+  agent any
 
   environment {
     MVN_OPTS = '-B'
@@ -13,7 +8,8 @@ pipeline {
   stages {
     stage('Checkout') {
       steps {
-        checkout scm
+        // explicitly clone the repo because this job is not using "Pipeline script from SCM"
+        git branch: 'master', url: 'https://github.com/karthika-murugesan-29/library-app.git'
       }
     }
 
