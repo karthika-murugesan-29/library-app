@@ -1,11 +1,11 @@
 pipeline {
  agent any
 
+  environment { 
+    MVN_OPTS = '-B' 
+            SONAR_TOKEN = credentials('SONAR_TOKEN') // Jenkins credential ID
 
-    environment {
-        SONAR_TOKEN = credentials('SONAR_TOKEN') // Jenkins credential ID
-    }
-  environment { MVN_OPTS = '-B' }
+}
   stages {
     stage('Checkout') {
       steps {
