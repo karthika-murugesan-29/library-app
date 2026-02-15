@@ -149,6 +149,15 @@ Steps:
 * Java naming conventions followed
 * SonarLint used for static analysis
 * SonarQube report used for coverage and quality checks
+* Java naming conventions followed; methods and fields use lowerCamelCase, classes use UpperCamelCase.
+* Use SonarLint in your IDE for on-the-fly feedback (install SonarLint plugin in VS Code/IntelliJ).
+* To run SonarQube analysis locally or in CI, configure `sonar.host.url` and `sonar.login` (token) and run:
+
+```bash
+mvn clean test sonar:sonar -Dsonar.host.url=http://your-sonar-host -Dsonar.login=$SONAR_TOKEN
+```
+
+* A `sonar-project.properties` file with basic settings is included at the project root. Do not commit tokens—set them in CI credentials.
 
 ---
 
