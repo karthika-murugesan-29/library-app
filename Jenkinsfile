@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   environment {
-    MVN_OPTS = '-B'
+    MVN_OPTS = '-U -B'
   }
 
   stages {
@@ -15,14 +15,7 @@ pipeline {
 
     stage('Build & Test') {
       steps {
-        sh "mvn ${MVN_OPTS} clean test"
-      }
-    }
-
-    stage('Generate JaCoCo Report') {
-      steps {
-        // generate HTML coverage report (jaCoCo plugin configured in pom.xml)
-        sh "mvn ${MVN_OPTS} jacoco:report || true"
+        sh "mvn ${MVN_OPTS} clean verify"
       }
     }
 
@@ -36,8 +29,12 @@ pipeline {
 
     stage('Sonar Analysis') {
       steps {
-        withCredentials([string(credentialsId: 'SONAR_TOKEN', variable: 'SONAR_TOKEN')]) {
-          sh "mvn ${MVN_OPTS} sonar:sonar -Dsonar.login=${SONAR_TOKEN} -Dsonar.host.url=$SONAR_HOST_URL"
+        script {
+          if (env.SONAR_TOKEN) {
+            sh "mvn ${MVN_OPTS} sonar:sonar -Dsonar.login=${env.SONAR_TOKEN} -Dsonar.host.url=${env.SONAR_HOST_URL ?: 'http://localhost:9000'}"
+          } else {
+            echo 'SONAR_TOKEN not found; skipping Sonar analysis. Add a Jenkins credential with id SONAR_TOKEN or set SONAR_TOKEN env var.'
+          }
         }
       }
     }
