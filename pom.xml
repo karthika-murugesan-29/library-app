@@ -12,6 +12,8 @@
   </parent>
 
   <properties>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
     <java.version>17</java.version>
     <jacoco.skip>false</jacoco.skip>
   </properties>
@@ -40,6 +42,13 @@
       <artifactId>lombok</artifactId>
       <optional>true</optional>
     </dependency>
+    <dependency>
+      <groupId>org.projectlombok</groupId>
+      <artifactId>lombok</artifactId>
+      <version>1.18.30</version> <!-- or latest -->
+      <scope>provided</scope>
+   </dependency>
+
   </dependencies>
   <build>
     <plugins>
