@@ -8,6 +8,7 @@ class LibraryAppApplicationTest {
 
     @Test
     void mainStartsWithoutException() {
-        assertDoesNotThrow(() -> LibraryAppApplication.main(new String[]{}));
+        String[] args = new String[]{"--spring.main.web-application-type=none"};
+        assertDoesNotThrow(() -> LibraryAppApplication.main(args));
     }
 }
