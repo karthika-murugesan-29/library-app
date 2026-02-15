@@ -1,5 +1,8 @@
 pipeline {
  agent any
+    environment {
+        SONAR_TOKEN = credentials('SONAR_TOKEN') // Jenkins credential ID
+    }
   environment { MVN_OPTS = '-B' }
   stages {
     stage('Checkout') {
@@ -27,7 +30,11 @@ pipeline {
       steps {
         script {
           if (env.SONAR_TOKEN) {
-            sh "mvn ${MVN_OPTS} sonar:sonar -Dsonar.login=${env.SONAR_TOKEN} -Dsonar.host.url=${env.SONAR_HOST_URL ?: 'http://localhost:9000'}"
+           mvn sonar:sonar \
+  -Dsonar.projectKey=library-app \
+  -Dsonar.host.url=http://<SONAR_HOST>:9000 \
+  -Dsonar.login=$SONAR_TOKEN
+
           } else {
             echo 'SONAR_TOKEN not found; skipping Sonar analysis. Add a Jenkins credential with id SONAR_TOKEN or set SONAR_TOKEN env var.'
           }
